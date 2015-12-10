@@ -1,0 +1,51 @@
+@(searches: List[models.Search])(implicit request:RequestHeader)
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <title>Play translator</title>
+    <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
+    @helper.javascriptRouter("jsRoutes")(
+      routes.javascript.Application.translate
+    )
+    <script>
+      $(function(){
+        $("button").click(function(e){
+          e.preventDefault()
+          $.ajax({
+            url:jsRoutes.controllers.Application.translate().url,
+            type:"POST",
+            data:JSON.stringify({"text":$("input").val()}),
+            contentType:"application/json; charset=utf-8",
+            dataType:"json"}
+          )
+          .done(function(data){
+            if(data.error)
+              $("#result").text(data.error)
+            else
+              $("#result").text(data.translated)
+          })
+          .error(function(data){
+              $("#result").text("Remote connection error")
+          })
+          return false
+        })
+      })
+    </script>
+  </head>
+
+  <body>
+    <form>
+      <input id="text-to-translate"></input>
+      <button>Translate!</button>
+    </form>
+    <p><span id="result"></span></p>
+    <p>Latest searchs</p>
+    <ul>
+    @for( search <- searches) {
+      <li>@search.text</li>
+    }
+    </ul>
+  </body>
+</html>
