@@ -6,6 +6,5 @@ import play.api.libs.json._
 case class Search(text:String, timestamp:DateTime = DateTime.now)
 
 object Search{
-
   implicit val f = Json.format[Search]
 }

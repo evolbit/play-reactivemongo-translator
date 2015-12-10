@@ -30,17 +30,15 @@ class Application @Inject() (val reactiveMongoApi: ReactiveMongoApi, ws: WSClien
 
   def collection: JSONCollection = db.collection[JSONCollection]("searches")
 
-  def index = Action.async {
-    implicit request =>
+  def index = Action.async { implicit request =>
 
     val cursor: Cursor[Search] = 
       collection
       .find(JsObject(Seq.empty[(String, JsValue)]))
-      .options(QueryOpts(0, 10))
       .sort(Json.obj("timestamp" -> -1))
       .cursor[Search](ReadPreference.primary)
 
-    cursor.collect[List]() map { searches =>  
+    cursor.collect[List](10) map { searches =>  
       Ok(views.html.index(searches))
     }
 
